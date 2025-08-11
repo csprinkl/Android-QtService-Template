@@ -1,0 +1,23 @@
+# Build directories
+build/
+build-*/
+android-build/
+
+# Qt generated files
+*.pro.user
+*.pro.user.*
+
+# Android generated files
+*.apk
+*.aab
+local.properties
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
