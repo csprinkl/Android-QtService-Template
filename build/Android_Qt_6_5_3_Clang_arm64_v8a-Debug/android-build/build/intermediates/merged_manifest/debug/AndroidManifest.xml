@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.example.qtservice"
+    android:installLocation="auto"
+    android:versionCode="1"
+    android:versionName="1.0.0" >
+
+    <uses-sdk
+        android:minSdkVersion="32"
+        android:targetSdkVersion="31" />
+
+    <!-- Existing permissions -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <!-- Background execution permissions (compatible with API 28) -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <supports-screens
+        android:anyDensity="true"
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true" />
+
+    <application
+        android:name="org.qtproject.qt.android.bindings.QtApplication"
+        android:allowBackup="true"
+        android:debuggable="true"
+        android:extractNativeLibs="true"
+        android:fullBackupOnly="false"
+        android:hardwareAccelerated="true"
+        android:label="@string/AndroidQtService" >
+        <activity
+            android:name="org.example.qtservice.MainActivity"
+            android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density"
+            android:exported="true"
+            android:label="@string/AndroidQtService"
+            android:launchMode="singleTop"
+            android:screenOrientation="unspecified" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="AndroidQtService" />
+            <meta-data
+                android:name="android.app.arguments"
+                android:value="" />
+            <meta-data
+                android:name="android.app.extract_android_style"
+                android:value="minimal" />
+        </activity>
+
+        <!-- Foreground service (API 28 compatible) -->
+        <service
+            android:name="org.qtproject.qt.android.bindings.QtService"
+            android:enabled="true"
+            android:exported="false" />
+        <service
+            android:name="org.example.qtservice.QtAndroidService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":qt" >
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="AndroidQtService" />
+            <meta-data
+                android:name="android.app.arguments"
+                android:value="-service" />
+            <meta-data
+                android:name="android.app.background_running"
+                android:value="true" />
+            <meta-data
+                android:name="android.app.extract_android_style"
+                android:value="none" />
+            <meta-data
+                android:name="qt.qpa.platform"
+                android:value="offscreen" />
+            <meta-data
+                android:name="android.app.qt_no_gui"
+                android:value="true" />
+        </service>
+    </application>
+
+</manifest>
