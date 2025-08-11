@@ -19,48 +19,26 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     
     <supports-screens android:anyDensity="true" android:largeScreens="true" android:normalScreens="true" android:smallScreens="true"/>
 
-    <application android:name="org.qtproject.qt.android.bindings.QtApplication"
-                 android:hardwareAccelerated="true"
-                 android:allowBackup="true"
-                 android:fullBackupOnly="false"
-                 android:label="@string/AndroidQtService"
-                 android:extractNativeLibs="true">
+    <application android:name="org.qtproject.qt.android.bindings.QtApplication" android:hardwareAccelerated="true" android:allowBackup="true" android:fullBackupOnly="false" android:label="@string/QtAndroidService" android:extractNativeLibs="true">
 
-        <activity android:name="org.example.qtservice.MainActivity"
-                  android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density"
-                  android:label="@string/AndroidQtService"
-                  android:launchMode="singleTop"
-                  android:screenOrientation="unspecified"
-                  android:exported="true">
+        <activity android:name="org.example.qtservice.MainActivity" android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density" android:label="@string/QtAndroidService" android:launchMode="singleTop" android:screenOrientation="unspecified" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            <meta-data android:name="android.app.lib_name" android:value="AndroidQtService"/>
+            <meta-data android:name="android.app.lib_name" android:value="QtAndroidService"/>
             <meta-data android:name="android.app.arguments" android:value=""/>
             <meta-data android:name="android.app.extract_android_style" android:value="minimal"/>
         </activity>
 
         <!-- Foreground service (API 28 compatible) -->
-        <service android:name="org.qtproject.qt.android.bindings.QtService"
-                 android:enabled="true"
-                 android:exported="false"/>
+        <service android:name="org.qtproject.qt.android.bindings.QtService" android:enabled="true" android:exported="false"/>
 
-        <service
-            android:name=".QtAndroidService"
-            android:process=":qt"
-            android:exported="true"
-            android:enabled="true">
-            <meta-data android:name="android.app.lib_name" android:value="AndroidQtService"/>
-            <meta-data android:name="android.app.arguments" android:value="-service"/>
+        <service android:name=".QtAndroidService" android:process=":qt" android:exported="true" android:enabled="true" android:foregroundServiceType="dataSync">
+            <meta-data android:name="android.app.lib_name" android:value="QtAndroidService"/>
             <meta-data android:name="android.app.background_running" android:value="true"/>
             <meta-data android:name="android.app.extract_android_style" android:value="none"/>
             <meta-data android:name="qt.qpa.platform" android:value="offscreen"/>

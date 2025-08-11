@@ -1,25 +1,25 @@
 {
     "logs": [
         {
-            "outputFile": "org.example.qtservice-mergeDebugResources-3:/values/values.xml",
+            "outputFile": "/Users/csprinkl/.gradle/daemon/8.0/org.example.qtservice-mergeDebugResources-3:/values/values.xml",
             "map": [
                 {
                     "source": "/Users/csprinkl/GitProjects/Android-QtService-Template/build/Android_Qt_6_5_3_Clang_arm64_v8a-Debug/android-build/res/values/libs.xml",
                     "from": {
-                        "startLines": "4,31,8,37,35,38,36",
+                        "startLines": "4,24,8,30,28,31,29",
                         "startColumns": "4,4,4,4,4,4,4",
-                        "startOffsets": "148,1293,203,1872,1614,1923,1824",
-                        "endLines": "6,33,29,37,35,38,36",
-                        "endColumns": "12,12,12,50,209,47,47",
-                        "endOffsets": "197,1608,1287,1918,1819,1966,1867"
+                        "startOffsets": "148,910,203,1134,1037,1185,1086",
+                        "endLines": "6,26,22,30,28,31,29",
+                        "endColumns": "12,12,12,50,48,47,47",
+                        "endOffsets": "197,1031,904,1180,1081,1228,1129"
                     },
                     "to": {
-                        "startLines": "2,5,8,31,33,34,36",
+                        "startLines": "2,5,8,24,26,27,29",
                         "startColumns": "4,4,4,4,4,4,4",
-                        "startOffsets": "55,109,429,1580,1739,1949,2087",
-                        "endLines": "4,7,29,31,33,34,36",
-                        "endColumns": "12,12,12,50,209,39,47",
-                        "endOffsets": "104,424,1513,1626,1944,1984,2130"
+                        "startOffsets": "55,109,235,1004,1163,1204,1342",
+                        "endLines": "4,7,22,24,26,27,29",
+                        "endColumns": "12,12,12,50,40,39,47",
+                        "endOffsets": "104,230,936,1050,1199,1239,1385"
                     }
                 },
                 {
@@ -28,15 +28,15 @@
                         "startLines": "1",
                         "startColumns": "4",
                         "startOffsets": "16",
-                        "endColumns": "61",
-                        "endOffsets": "73"
+                        "endColumns": "62",
+                        "endOffsets": "74"
                     },
                     "to": {
-                        "startLines": "30",
+                        "startLines": "23",
                         "startColumns": "4",
-                        "startOffsets": "1518",
-                        "endColumns": "61",
-                        "endOffsets": "1575"
+                        "startOffsets": "941",
+                        "endColumns": "62",
+                        "endOffsets": "999"
                     }
                 },
                 {
@@ -49,11 +49,64 @@
                         "endOffsets": "188,286"
                     },
                     "to": {
-                        "startLines": "32,35",
+                        "startLines": "25,28",
                         "startColumns": "4,4",
-                        "startOffsets": "1631,1989",
+                        "startOffsets": "1055,1244",
                         "endColumns": "107,97",
-                        "endOffsets": "1734,2082"
+                        "endOffsets": "1158,1337"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "org.example.qtservice-mergeDebugResources-3:/values/values.xml",
+            "map": [
+                {
+                    "source": "/Users/csprinkl/GitProjects/Android-QtService-Template/build/Android_Qt_6_5_3_Clang_arm64_v8a-Debug/android-build/res/values/libs.xml",
+                    "from": {
+                        "startLines": "-1,-1,-1,-1,-1,-1,-1",
+                        "startColumns": "-1,-1,-1,-1,-1,-1,-1",
+                        "startOffsets": "-1,-1,-1,-1,-1,-1,-1"
+                    },
+                    "to": {
+                        "startLines": "2,5,8,24,26,27,29",
+                        "startColumns": "4,4,4,4,4,4,4",
+                        "startOffsets": "55,109,235,1003,1162,1203,1341",
+                        "endLines": "4,7,22,24,26,27,29",
+                        "endColumns": "12,12,12,50,40,39,47",
+                        "endOffsets": "104,230,936,1049,1198,1238,1384"
+                    }
+                },
+                {
+                    "source": "/Users/csprinkl/GitProjects/Android-QtService-Template/build/Android_Qt_6_5_3_Clang_arm64_v8a-Debug/android-build/res/values/strings.xml",
+                    "from": {
+                        "startLines": "1",
+                        "startColumns": "4",
+                        "startOffsets": "16",
+                        "endColumns": "61",
+                        "endOffsets": "73"
+                    },
+                    "to": {
+                        "startLines": "23",
+                        "startColumns": "4",
+                        "startOffsets": "941",
+                        "endColumns": "61",
+                        "endOffsets": "998"
+                    }
+                },
+                {
+                    "source": "/Users/csprinkl/Qt/6.5.3/android_arm64_v8a/src/android/java/res/values/strings.xml",
+                    "from": {
+                        "startLines": "-1,-1",
+                        "startColumns": "-1,-1",
+                        "startOffsets": "-1,-1"
+                    },
+                    "to": {
+                        "startLines": "25,28",
+                        "startColumns": "4,4",
+                        "startOffsets": "1054,1243",
+                        "endColumns": "107,97",
+                        "endOffsets": "1157,1336"
                     }
                 }
             ]

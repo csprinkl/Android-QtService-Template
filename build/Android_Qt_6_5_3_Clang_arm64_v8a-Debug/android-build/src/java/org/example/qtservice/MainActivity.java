@@ -5,9 +5,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import org.qtproject.qt.android.bindings.QtActivity;
 
-public class MainActivity extends QtActivity {
+public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
 
     @Override

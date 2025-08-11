@@ -6,8 +6,8 @@
     android:versionName="1.0.0" >
 
     <uses-sdk
-        android:minSdkVersion="32"
-        android:targetSdkVersion="31" />
+        android:minSdkVersion="23"
+        android:targetSdkVersion="32" />
 
     <!-- Existing permissions -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -24,11 +24,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <supports-screens
         android:anyDensity="true"
@@ -43,12 +38,12 @@
         android:extractNativeLibs="true"
         android:fullBackupOnly="false"
         android:hardwareAccelerated="true"
-        android:label="@string/AndroidQtService" >
+        android:label="@string/QtAndroidService" >
         <activity
             android:name="org.example.qtservice.MainActivity"
             android:configChanges="orientation|uiMode|screenLayout|screenSize|smallestScreenSize|layoutDirection|locale|fontScale|keyboard|keyboardHidden|navigation|mcc|mnc|density"
             android:exported="true"
-            android:label="@string/AndroidQtService"
+            android:label="@string/QtAndroidService"
             android:launchMode="singleTop"
             android:screenOrientation="unspecified" >
             <intent-filter>
@@ -59,7 +54,7 @@
 
             <meta-data
                 android:name="android.app.lib_name"
-                android:value="AndroidQtService" />
+                android:value="QtAndroidService" />
             <meta-data
                 android:name="android.app.arguments"
                 android:value="" />
@@ -77,13 +72,11 @@
             android:name="org.example.qtservice.QtAndroidService"
             android:enabled="true"
             android:exported="true"
+            android:foregroundServiceType="dataSync"
             android:process=":qt" >
             <meta-data
                 android:name="android.app.lib_name"
-                android:value="AndroidQtService" />
-            <meta-data
-                android:name="android.app.arguments"
-                android:value="-service" />
+                android:value="QtAndroidService" />
             <meta-data
                 android:name="android.app.background_running"
                 android:value="true" />
