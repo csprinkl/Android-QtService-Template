@@ -1,4 +1,4 @@
-package org.example.qtservice;
+package org.qtproject.qtservice;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -16,9 +16,14 @@ import org.qtproject.qt.android.QtNative;
 import org.qtproject.qt.android.QtServiceDelegate;
 import org.qtproject.qt.android.bindings.QtService;
 
-public class QtAndroidService extends QtService {
-    private static final String TAG = "QtAndroidService";
-    private static final String CHANNEL_ID = "qt_timer_service_channel";
+/**
+ * Generic Qt Android Service wrapper for QtAndroidService library.
+ * This class can be extended by third-party applications to integrate
+ * the Qt timer service functionality.
+ */
+public class QtServiceWrapper extends QtService {
+    private static final String TAG = "QtServiceWrapper";
+    private static final String DEFAULT_CHANNEL_ID = "qt_service_library_channel";
     private static final int NOTIFICATION_ID = 1;
 
     private QtServiceDelegate m_delegate;
@@ -26,10 +31,32 @@ public class QtAndroidService extends QtService {
     private static boolean qtStarted = false;
     private Handler mainHandler;
 
+    // Configuration methods - can be overridden by subclass or consuming app
+    protected String getLibraryName() {
+        return "QtAndroidService"; // Default library name
+    }
+
+    protected String getServiceTitle() {
+        return "Qt Service Library";
+    }
+
+    protected String getChannelName() {
+        return "Qt Background Service";
+    }
+
+    protected String getChannelId() {
+        return DEFAULT_CHANNEL_ID;
+    }
+
+    protected String getPackageName() {
+        return super.getPackageName();
+    }
+
     @Override
     public void onCreate() {
-        Log.d(TAG, "=== QtAndroidService onCreate (FAST EXIT) ===");
+        Log.d(TAG, "=== QtServiceWrapper onCreate (LIBRARY MODE) ===");
         Log.d(TAG, "Process ID: " + android.os.Process.myPid());
+        Log.d(TAG, "Package: " + getPackageName());
 
         mainHandler = new Handler(Looper.getMainLooper());
 
@@ -37,7 +64,7 @@ public class QtAndroidService extends QtService {
         Log.d(TAG, "Starting foreground service immediately...");
         createNotificationChannel();
 
-        Notification notification = createServiceNotification("Qt Timer Service starting...");
+        Notification notification = createServiceNotification("Initializing Qt service library...");
         startForeground(NOTIFICATION_ID, notification);
         Log.d(TAG, "✓ Foreground service started");
 
@@ -57,14 +84,14 @@ public class QtAndroidService extends QtService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "=== QtAndroidService onStartCommand (FAST EXIT) ===");
+        Log.d(TAG, "=== QtServiceWrapper onStartCommand (LIBRARY MODE) ===");
 
         // Ensure foreground service is active
         createNotificationChannel();
 
         String statusText = qtInitialized ?
-                "Running 4 timer threads (1s, 2s, 3s, 5s intervals)" :
-                qtStarted ? "Qt initializing in background..." : "Qt Timer Service starting...";
+                "Qt service library active - timer threads running" :
+                qtStarted ? "Qt library initializing..." : "Starting Qt service library...";
 
         Notification notification = createServiceNotification(statusText);
         startForeground(NOTIFICATION_ID, notification);
@@ -86,7 +113,7 @@ public class QtAndroidService extends QtService {
 
     @Override
     public void onDestroy() {
-        Log.d(TAG, "=== QtAndroidService onDestroy ===");
+        Log.d(TAG, "=== QtServiceWrapper onDestroy ===");
 
         try {
             // Stop foreground service
@@ -94,7 +121,7 @@ public class QtAndroidService extends QtService {
 
             // Clean up Qt if initialized
             if (m_delegate != null && qtInitialized) {
-                Log.d(TAG, "Cleaning up Qt runtime...");
+                Log.d(TAG, "Cleaning up Qt library runtime...");
                 try {
                     QtNative.quitQtCoreApplication();
                     Thread.sleep(1000);
@@ -106,10 +133,10 @@ public class QtAndroidService extends QtService {
 
             qtInitialized = false;
             qtStarted = false;
-            Log.d(TAG, "Service cleanup completed");
+            Log.d(TAG, "Qt service library cleanup completed");
 
         } catch (Exception e) {
-            Log.e(TAG, "Error during service cleanup", e);
+            Log.e(TAG, "Error during Qt service library cleanup", e);
         } finally {
             // Don't call super.onDestroy() until Qt is cleaned up
             if (qtInitialized) {
@@ -125,7 +152,7 @@ public class QtAndroidService extends QtService {
     }
 
     private void startQtInitialization() {
-        Log.d(TAG, "Starting Qt initialization in background thread...");
+        Log.d(TAG, "Starting Qt library initialization in background thread...");
 
         // Run Qt initialization in a separate thread
         new Thread(new Runnable() {
@@ -137,10 +164,10 @@ public class QtAndroidService extends QtService {
     }
 
     private void initializeQt() {
-        Log.d(TAG, "Qt initialization thread started");
+        Log.d(TAG, "Qt library initialization thread started");
 
         try {
-            updateNotification("Loading Qt libraries...");
+            updateNotification("Loading Qt service library...");
 
             // Enable Qt logging
             System.setProperty("QT_LOGGING_RULES", "*=true");
@@ -148,67 +175,79 @@ public class QtAndroidService extends QtService {
             System.setProperty("QT_ANDROID_PLAIN_LOG", "1");
 
             // Debug library loading
-            updateNotification("Attempting to load Qt library...");
+            updateNotification("Attempting to load Qt library: " + getLibraryName());
             if (!debugLibraryLoading()) {
                 return; // Exit if no library could be loaded
             }
 
-            updateNotification("Initializing Qt runtime...");
+            updateNotification("Initializing Qt service runtime...");
 
             // Initialize Qt service delegate
             m_delegate = new QtServiceDelegate();
 
             Bundle extras = new Bundle();
-            extras.putString("android.app.lib_name", "QtAndroidService");
+            extras.putString("android.app.lib_name", getLibraryName());
             extras.putString("android.app.arguments", "-v");
             extras.putBoolean("android.app.background_running", true);
             extras.putString("android.app.extract_android_style", "none");
             extras.putString("qt.qpa.platform", "offscreen");
             extras.putBoolean("android.app.qt_no_gui", true);
 
-            Log.d(TAG, "Loading Qt application...");
+            Log.d(TAG, "Loading Qt service application...");
             m_delegate.loadApplication(this, getClassLoader(), extras);
 
             Log.d(TAG, "Setting Qt native service...");
             QtNative.setService(this, m_delegate);
 
-            updateNotification("Starting Qt application...");
+            updateNotification("Starting Qt service application...");
 
             // Call super.onCreate() in background thread
-            Log.d(TAG, "Calling super.onCreate() for Qt initialization...");
+            Log.d(TAG, "Calling super.onCreate() for Qt service initialization...");
             super.onCreate();
 
             qtInitialized = true;
-            Log.d(TAG, "✓ Qt initialization completed successfully");
+            Log.d(TAG, "✓ Qt service library initialization completed successfully");
 
             // Update notification to show success
-            updateNotification("Qt Timer Service active - 4 timer threads running");
+            updateNotification("Qt service library active - background service running");
 
         } catch (Exception e) {
-            Log.e(TAG, "Qt initialization failed", e);
-            updateNotification("ERROR: Qt initialization failed - " + e.getMessage());
+            Log.e(TAG, "Qt service library initialization failed", e);
+            updateNotification("ERROR: Qt service library initialization failed - " + e.getMessage());
         }
     }
 
     private boolean debugLibraryLoading() {
-        Log.d(TAG, "=== DEBUGGING LIBRARY LOADING ===");
+        Log.d(TAG, "=== DEBUGGING QT LIBRARY LOADING ===");
 
         // Debug application info
         Log.d(TAG, "Package: " + getPackageName());
         Log.d(TAG, "Native lib dir: " + getApplicationInfo().nativeLibraryDir);
+        Log.d(TAG, "Library name: " + getLibraryName());
 
-        try {
-            Log.d(TAG, "Attempting to load: " + "QtAndroidService_arm64-v8a");
-            System.loadLibrary("QtAndroidService_arm64-v8a");
-            Log.d(TAG, "✓ SUCCESS: Loaded library: " + "QtAndroidService_arm64-v8a");
-            updateNotification("Qt library loaded: " + "QtAndroidService_arm64-v8a");
-            return true;
-        } catch (UnsatisfiedLinkError e) {
-            Log.d(TAG, "✗ FAILED: " + "QtAndroidService_arm64-v8a" + " - " + e.getMessage());
+        // Try multiple library name variations for flexibility
+        String[] libraryVariations = {
+                getLibraryName() + "_arm64-v8a",  // Architecture-specific
+                getLibraryName(),                 // Base name
+                "lib" + getLibraryName() + "_arm64-v8a", // Full name variation
+                "lib" + getLibraryName()          // Lib prefix variation
+        };
+
+        for (String libName : libraryVariations) {
+            try {
+                Log.d(TAG, "Attempting to load: " + libName);
+                System.loadLibrary(libName);
+                Log.d(TAG, "✓ SUCCESS: Loaded Qt library: " + libName);
+                updateNotification("Qt library loaded: " + libName);
+                return true;
+            } catch (UnsatisfiedLinkError e) {
+                Log.d(TAG, "✗ FAILED: " + libName + " - " + e.getMessage());
+            }
         }
 
-        Log.e(TAG, "CRITICAL: No Qt libraries could be loaded!");
-        updateNotification("ERROR: No Qt libraries found");
+        Log.e(TAG, "CRITICAL: No Qt service libraries could be loaded!");
+        Log.e(TAG, "Tried variations: " + java.util.Arrays.toString(libraryVariations));
+        updateNotification("ERROR: Qt service library not found");
         return false;
     }
 
@@ -216,15 +255,15 @@ public class QtAndroidService extends QtService {
         Notification.Builder builder;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            builder = new Notification.Builder(this, CHANNEL_ID);
+            builder = new Notification.Builder(this, getChannelId());
         } else {
             builder = new Notification.Builder(this);
         }
 
         return builder
-                .setContentTitle("Qt Timer Service")
+                .setContentTitle(getServiceTitle())
                 .setContentText(statusText)
-                .setSmallIcon(android.R.drawable.ic_media_play)
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
                 .setOngoing(true)
                 .setPriority(Notification.PRIORITY_LOW)
                 .build();
@@ -246,17 +285,17 @@ public class QtAndroidService extends QtService {
     private void createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
-                    CHANNEL_ID,
-                    "Qt Timer Service",
+                    getChannelId(),
+                    getChannelName(),
                     NotificationManager.IMPORTANCE_LOW
             );
-            channel.setDescription("Background Qt timer service with multiple threads");
+            channel.setDescription("Qt-based background service library");
             channel.setShowBadge(false);
 
             NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
             if (manager != null) {
                 manager.createNotificationChannel(channel);
-                Log.d(TAG, "✓ Notification channel created");
+                Log.d(TAG, "✓ Notification channel created: " + getChannelName());
             }
         }
     }

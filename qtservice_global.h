@@ -1,0 +1,17 @@
+#ifndef QTSERVICE_GLOBAL_H
+#define QTSERVICE_GLOBAL_H
+
+#include <QtCore/QtGlobal>
+
+#if defined(QTSERVICE_LIBRARY)
+#  define QTSERVICE_EXPORT Q_DECL_EXPORT
+#else
+#  define QTSERVICE_EXPORT Q_DECL_IMPORT
+#endif
+
+// Library version
+#define QTSERVICE_VERSION_MAJOR 1
+#define QTSERVICE_VERSION_MINOR 0
+#define QTSERVICE_VERSION_PATCH 0
+
+#endif // QTSERVICE_GLOBAL_H
