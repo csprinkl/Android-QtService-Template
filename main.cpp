@@ -13,11 +13,145 @@
 #define ANDROID_LOG(...)
 #endif
 
+// Global state for library interface
+static QCoreApplication* g_app = nullptr;
+static QThread* g_threads[4] = {nullptr};
+static TimerWorker* g_workers[4] = {nullptr};
+static bool g_initialized = false;
+static bool g_running = false;
+
+// C interface functions for JNI wrapper
+extern "C" {
+
+const char* qt_service_get_version() {
+    return "QtAndroidService 1.0.0 (Static Library)";
+}
+
+bool qt_service_initialize() {
+    if (g_initialized) {
+        ANDROID_LOG("Qt service already initialized");
+        return true;
+    }
+
+    ANDROID_LOG("=== Initializing Qt Timer Service Library ===");
+
+    // Create QCoreApplication if needed
+    if (!QCoreApplication::instance()) {
+        int argc = 1;
+        static char appName[] = "QtAndroidService";
+        static char* argv[] = {appName, nullptr};
+        g_app = new QCoreApplication(argc, argv);
+        ANDROID_LOG("Created QCoreApplication for library");
+    } else {
+        g_app = QCoreApplication::instance();
+        ANDROID_LOG("Using existing QCoreApplication");
+    }
+
+    g_initialized = true;
+    ANDROID_LOG("Qt service library initialized successfully");
+    return true;
+}
+
+bool qt_service_start() {
+    if (!g_initialized) {
+        ANDROID_LOG("Service not initialized - call qt_service_initialize() first");
+        return false;
+    }
+
+    if (g_running) {
+        ANDROID_LOG("Service already running");
+        return true;
+    }
+
+    ANDROID_LOG("=== Starting Qt Timer Service ===");
+
+    // Create threads and workers (same logic as your main function)
+    int intervals[] = {1000, 2000, 3000, 5000}; // 1s, 2s, 3s, 5s
+
+    for (int i = 0; i < 4; i++) {
+        g_threads[i] = new QThread();
+        g_workers[i] = new TimerWorker(i + 1, intervals[i]);
+
+        ANDROID_LOG("Created worker %d with %d ms interval", i + 1, intervals[i]);
+
+        // Move worker to thread
+        g_workers[i]->moveToThread(g_threads[i]);
+
+        // Connect signals (same as your original code)
+        QObject::connect(g_threads[i], &QThread::started, g_workers[i], &TimerWorker::startWork);
+        QObject::connect(g_workers[i], &TimerWorker::destroyed, g_threads[i], &QThread::quit);
+    }
+
+    // Start all threads
+    for (int i = 0; i < 4; i++) {
+        g_threads[i]->start();
+        ANDROID_LOG("Thread %d started", i + 1);
+    }
+
+    g_running = true;
+    ANDROID_LOG("All timer threads started - service is now running");
+    return true;
+}
+
+bool qt_service_stop() {
+    if (!g_running) {
+        ANDROID_LOG("Service not running");
+        return true;
+    }
+
+    ANDROID_LOG("=== Stopping Qt Timer Service ===");
+
+    // Stop workers
+    for (int i = 0; i < 4; i++) {
+        if (g_workers[i]) {
+            g_workers[i]->stopWork();
+            g_workers[i]->deleteLater();
+            g_workers[i] = nullptr;
+        }
+    }
+
+    // Stop threads
+    for (int i = 0; i < 4; i++) {
+        if (g_threads[i]) {
+            g_threads[i]->quit();
+            g_threads[i]->wait(3000);
+            delete g_threads[i];
+            g_threads[i] = nullptr;
+        }
+    }
+
+    g_running = false;
+    ANDROID_LOG("Qt Timer Service stopped");
+    return true;
+}
+
+bool qt_service_is_running() {
+    return g_running;
+}
+
+void qt_service_cleanup() {
+    ANDROID_LOG("=== Qt Timer Service Cleanup ===");
+
+    qt_service_stop();
+
+    if (g_app) {
+        delete g_app;
+        g_app = nullptr;
+        ANDROID_LOG("QCoreApplication cleaned up");
+    }
+
+    g_initialized = false;
+    ANDROID_LOG("Cleanup complete");
+}
+
+} // extern "C"
+
+// Your original main function for standalone testing
 int main(int argc, char *argv[]) {
     QCoreApplication a(argc, argv);
 
     // Android service logging
-    ANDROID_LOG("=== Qt Timer Service Starting ===");
+    ANDROID_LOG("=== Qt Timer Service Starting (Standalone Mode) ===");
     qWarning() << ">>> QtService main() started with args:" << QCoreApplication::arguments();
 
     ANDROID_LOG("Step 1: Creating command line parser");
@@ -134,6 +268,11 @@ int main(int argc, char *argv[]) {
     // For Android services, we need to handle the event loop carefully
     QTimer::singleShot(1000, [&]() {
         ANDROID_LOG("Timer threads should be running now - check for timer tick outputs");
+    });
+
+    // Handle cleanup on quit
+    QObject::connect(&a, &QCoreApplication::aboutToQuit, []() {
+        ANDROID_LOG("Standalone mode cleanup");
     });
 
     // Start the event loop and run until quit() is called
